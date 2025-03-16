@@ -1,0 +1,267 @@
+---
+title: 'My First Project'
+format: dashboard
+echo: false
+---
+
+```{python}
+
+#| echo: false
+import folium
+import requests
+import pandas as pd
+from IPython.display import display
+from PIL import Image
+import matplotlib.pyplot as plt
+import itables
+import itables.options as opt
+from itables import show
+from io import BytesIO
+
+df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+
+```
+
+# Description
+
+
+
+```{python}
+#| title: Hello it`s my first project
+url = "https://avatars.mds.yandex.net/i?id=3bc82374755bb30223c63a09b5977c4aa04551f4-12615842-images-thumbs&n=13.jpeg"
+response = requests.get(url)
+img = Image.open(BytesIO(response.content))
+
+display(img)  # Отображение изображения
+
+```
+
+
+# Listing Details
+
+
+```{python}
+
+#| echo: false
+import pandas as pd
+from itables import show
+df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+
+df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Не Активен'})
+df['type'] = df['id'].apply(lambda x: 'OR' if sum(c.isalpha() for c in str(x)) >= 2 else 'IR')
+output_df = df[['organisation', 'status', 'type', 'id', 'region', 'city']].reset_index(drop=True)
+```
+
+
+```{python}
+import pandas as pd
+from itables import show
+
+# Читаем Excel-файл
+df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+
+# Заменяем True/False на "Активен"/"Не Активен"
+df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Не Активен'})
+
+# Определяем тип (OR/IR)
+df['type'] = df['id'].apply(lambda x: 'OR' if sum(c.isalpha() for c in str(x)) >= 2 else 'IR')
+
+# Выбираем нужные колонки
+output_df = df[['status', 'organisation', 'type', 'id', 'region', 'city']].reset_index(drop=True)
+
+# Применяем Title Case к строковым колонкам
+text_columns = ['status', 'organisation', 'type', 'region', 'city']
+output_df[text_columns] = output_df[text_columns].apply(lambda col: col.astype(str).str.title())
+
+# Функция для стилизации строк по статусу
+def highlight_status(row):
+    color = 'white' if row['status'] == 'Активен' else 'lightblue'
+    return [f'background-color: {color}; color: black; font-weight: normal;' for _ in row]
+
+# Применяем стили
+styled_df = output_df.style.apply(highlight_status, axis=1).set_table_styles([
+    {"selector": "table", "props": [("background-color", "#f0f0f0"),  # Фон всей таблицы
+                                    ("border", "2px solid black"),
+                                    ("width", "100%")]},
+    {"selector": "th", "props": [("background-color", "#333"),  # Фон заголовков
+                                 ("color", "white"),
+                                 ("font-size", "16px"),
+                                 ("text-align", "center")]}
+])
+
+show(styled_df)
+```
+
+
+# Main
+
+## {height=10%}
+
+
+```{python}
+#| content: valuebox
+#| title: "Неактивные магазины"
+#| echo: false
+dict(
+    icon="house",
+    color="danger",
+    value=int(df['status'].eq('Не Активен').sum())  # eq() - аналог (df['status'] == 'Не Активен')
+)
+```
+
+```{python}
+#| content: valuebox
+#| title: "Активные магазины"
+#| echo: false
+dict(
+    icon="house",
+    color="success",
+    value=int(df['status'].eq('Активен').sum())  
+)
+```
+
+
+# View Pie
+
+```{python}
+#| echo: false
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+
+status_counts = df['status'].value_counts()
+colors = ['blue', 'red']
+labels = ['Active', 'UnActive']
+
+plt.figure(figsize=(8, 8))
+plt.pie(
+    status_counts, 
+    labels=labels, 
+    autopct='%1.1f%%', 
+    startangle=140, 
+    colors=colors,
+    wedgeprops={'edgecolor': 'black'})
+
+plt.title('Percentage of Active and UnActive Stores', fontsize=16, fontweight='bold')
+plt.show();
+```
+
+```{python}
+#| echo: false
+#| title: Active UnActive Shops
+df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+
+region_active_status = df.groupby(['region', 'status'])['id'].count().unstack(fill_value=0)
+
+colors = ['red', 'blue']
+
+ax = region_active_status.plot(
+    kind='bar',
+    stacked=False,
+    color=colors,
+    figsize=(13, 8),
+    edgecolor='black',
+    width=0.8
+)
+
+for container in ax.containers:
+    ax.bar_label(container, fmt='%d', fontsize=12, padding=3)
+
+
+plt.title('Active and UnActive Stores by Region', fontsize=16, fontweight='bold')
+plt.xlabel('Region', fontsize=14)
+plt.ylabel('Count of Stores', fontsize=14)
+plt.xticks(rotation=45, fontsize=12)
+plt.yticks(fontsize=12)
+plt.legend(['Не Активны', 'Активнык'], title='Status', fontsize=12)
+plt.tight_layout()
+
+plt.show();
+```
+
+# Store in the Map
+
+
+```{python}
+#| echo: false
+
+from IPython.display import display
+import pandas as pd
+import folium
+from folium.plugins import Search
+
+df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+
+if df.empty:
+    print("DataFrame is empty, creating a default map.")
+    my_map = folium.Map(location=[41.3775, 64.5853], zoom_start=5)
+else:
+    # Удаляем строки с пустыми координатами
+    df = df.dropna(subset=['lat', 'long'])
+
+    # Преобразуем координаты в числа и заменяем NaN на 0
+    df['lat'] = pd.to_numeric(df['lat'], errors='coerce').fillna(0)
+    df['long'] = pd.to_numeric(df['long'], errors='coerce').fillna(0)
+
+    # Убираем NaN в store и region
+    df['id'] = df['id'].fillna("N/A").astype(str)
+    df['region'] = df['region'].fillna("Unknown").astype(str)
+
+    # Создаём карту с центром в среднем значении координат
+    map_center = [
+        df['lat'].mean() if df['lat'].sum() != 0 else 41.3775,
+        df['long'].mean() if df['long'].sum() != 0 else 64.5853
+    ]
+    my_map = folium.Map(location=map_center, zoom_start=5)
+
+    # Группируем маркеры
+    marker_group = folium.FeatureGroup(name="Stores").add_to(my_map)
+
+    # Определяем цвета для маркеров
+    color_map = {True: "green", False: "red"}
+
+    for _, row in df.iterrows():
+        store_status = row['status']  # Проверяем статус магазина
+        marker_color = color_map.get(store_status, "gray")  # По умолчанию серый
+
+        _ = folium.Marker(
+              location=[row['lat'], row['long']],
+              popup=folium.Popup(
+          f"""
+          <div style="
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              color: #333;
+              padding: 8px;
+              border-radius: 8px;
+              # box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+              background: #fff;
+              width: 200px;
+          ">
+              <b>ID Магазина:</b> {row['id']}<br>
+              <b>Клиент:</b> {row['organisation']}<br>
+              <b>Регион:</b> {row['region']}<br>
+              <b>Статус:</b> {'🟢 Активный' if store_status else '🔴 Неактивный'}
+          </div>
+          """,
+          max_width=250
+    ),
+    # tooltip=f"Магазин {row['id']}, Регион: {row['region']}",
+    icon=folium.Icon(color=marker_color,icon='home'),
+    name=row['id']
+).add_to(marker_group)
+
+    # Добавляем поиск по ID магазина (работает только с FeatureGroup)
+    search = Search(
+        layer=marker_group,
+        search_label="name",
+        placeholder="Поиск по ID магазина",
+        collapsed=False
+    ).add_to(my_map);
+
+my_map
+
+```
+
+
