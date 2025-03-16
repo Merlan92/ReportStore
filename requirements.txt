@@ -1,0 +1,9 @@
+jupyter
+pandas
+numpy
+matplotlib
+itabeles=2.0.0
+shiny
+ficons
+plotly
+folium
