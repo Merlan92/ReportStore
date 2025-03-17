@@ -18,7 +18,7 @@ import itables.options as opt
 from itables import show
 from io import BytesIO
 
-df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+df = pd.read_excel("DF-Set.xlsx")
 
 ```
 
@@ -45,7 +45,7 @@ display(img)  # Отображение изображения
 #| echo: false
 import pandas as pd
 from itables import show
-df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+df = pd.read_excel("DF-Set.xlsx")
 
 df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Не Активен'})
 df['type'] = df['id'].apply(lambda x: 'OR' if sum(c.isalpha() for c in str(x)) >= 2 else 'IR')
@@ -58,7 +58,7 @@ import pandas as pd
 from itables import show
 
 # Читаем Excel-файл
-df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+df = pd.read_excel("DF-Set.xlsx")
 
 # Заменяем True/False на "Активен"/"Не Активен"
 df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Не Активен'})
@@ -128,7 +128,7 @@ dict(
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+df = pd.read_excel("DF-Set.xlsx")
 
 status_counts = df['status'].value_counts()
 colors = ['blue', 'red']
@@ -150,7 +150,7 @@ plt.show();
 ```{python}
 #| echo: false
 #| title: Active UnActive Shops
-df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+df = pd.read_excel("DF-Set.xlsx")
 
 region_active_status = df.groupby(['region', 'status'])['id'].count().unstack(fill_value=0)
 
@@ -191,7 +191,7 @@ import pandas as pd
 import folium
 from folium.plugins import Search
 
-df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+df = pd.read_excel("DF-Set.xlsx")
 
 if df.empty:
     print("DataFrame is empty, creating a default map.")
