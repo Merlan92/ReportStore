@@ -2,7 +2,7 @@ jupyter
 pandas
 numpy
 matplotlib
-tabulate==2.0.0
+itables==2.0.0
 shiny
 plotly
 folium
