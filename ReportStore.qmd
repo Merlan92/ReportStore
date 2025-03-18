@@ -28,11 +28,24 @@ df = pd.read_excel("DF-Set.xlsx")
 
 ```{python}
 #| title: Hello it`s my first project
+#| echo: false
+from PIL import Image
+import requests
+from io import BytesIO
+
+# URL изображения
 url = "https://avatars.mds.yandex.net/i?id=3bc82374755bb30223c63a09b5977c4aa04551f4-12615842-images-thumbs&n=13.jpeg"
+
+# Загрузка изображения
 response = requests.get(url)
 img = Image.open(BytesIO(response.content))
 
-display(img)  # Отображение изображения
+# Изменение размера (например, до 200x200)
+new_size = (600, 400)
+resized_img = img.resize(new_size)
+
+# Отображение уменьшенного изображения
+resized_img.show();
 
 ```
 
@@ -119,10 +132,6 @@ dict(
     value=int(df['status'].eq('Активен').sum())  
 )
 ```
-
-
-# View Pie
-
 ```{python}
 #| echo: false
 import pandas as pd
@@ -146,6 +155,8 @@ plt.pie(
 plt.title('Percentage of Active and UnActive Stores', fontsize=16, fontweight='bold')
 plt.show();
 ```
+
+
 
 ```{python}
 #| echo: false
@@ -263,5 +274,3 @@ else:
 my_map
 
 ```
-
-
