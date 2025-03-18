@@ -9,7 +9,6 @@ echo: false
 
 [Перейти на сайт BM Electronics](https://bme.uz/)
 
-
 # Info About The Received Data
 
 ```{python}
@@ -23,44 +22,41 @@ from folium.plugins import Search
 from io import BytesIO
 from PIL import Image
 import requests
-from itables import show
 
 df = pd.read_excel("DF-Set.xlsx")
+
+# Исправляем названия столбцов
+if 'широта' in df.columns and 'долгота' in df.columns:
+    df.rename(columns={'широта': 'lat', 'долгота': 'long'}, inplace=True)
+
 def highlight_inactive(row):
-    if row['status'] == 'Не активен':
-        return ['background-color: blue'] * len(row)
-    return [''] * len(row)
-df = pd.read_excel("DF-Set.xlsx")
+    return ['background-color: blue'] * len(row) if row['status'] == 'Неактивен' else [''] * len(row)
+
 df['type'] = df['id'].apply(lambda x: 'OR' if sum(c.isalpha() for c in str(x)) >= 2 else 'IR') 
-df['status'] = df['status'].map({True: 'Активен', False: 'Не активен'})
+df['status'] = df['status'].map({True: 'Активен', False: 'Неактивен'})
 styled_output = df.style.apply(highlight_inactive, axis=1).set_table_styles([
     {'selector': 'thead th', 'props': [('color', 'white'), ('background-color', 'black')]}
 ])
-df = df[['organisation', 'status', 'type', 'id', 'region', 'city']].reset_index(drop=True)
-display(styled_output)  
+df = df[['organisation', 'status', 'type', 'id', 'region', 'city', 'lat', 'long']].reset_index(drop=True)
+display(styled_output)
 ```
 
-
-
 ```{python}
-#| layout-nrow: 1
-#| layout-ncol: 2
-
 #| content: valuebox
 #| title: "Неактивные магазины"
 #| icon: house
 #| color: red
-dict(value=int(df['status'].eq('Не Активен').sum()));
-```
 
+dict(value=int(df['status'].eq('Неактивен').sum()))
+```
 
 ```{python}
 #| content: valuebox
 #| title: "Активные магазины"
 #| icon: house
 #| color: green
-dict(value=int(df['status'].eq('Активен').sum()));
 
+dict(value=int(df['status'].eq('Активен').sum()))
 ```
 
 # Charts
@@ -81,17 +77,13 @@ plt.pie(
     wedgeprops={'edgecolor': 'black'}
 )
 plt.title('Процент активных и неактивных магазинов', fontsize=16, fontweight='bold')
-plt.show();
+plt.show()
 ```
 
-
 ```{python}
-
 #| echo: false
 region_active_status = df.groupby(['region', 'status'])['id'].count().unstack(fill_value=0)
-
 colors = ['red', 'blue']
-
 ax = region_active_status.plot(
     kind='bar',
     stacked=False,
@@ -111,28 +103,20 @@ plt.xticks(rotation=45, fontsize=12)
 plt.yticks(fontsize=12)
 plt.legend(['Неактивные', 'Активные'], title='Статус', fontsize=12)
 plt.tight_layout()
-plt.show();
-
+plt.show()
 ```
-
 
 # Map
 ```{python}
 #| echo: false
-
-
 import folium
 from folium.plugins import Search
 import pandas as pd
 
-
 if df.empty:
     my_map = folium.Map(location=[41.3775, 64.5853], zoom_start=5)
 else:
-    
     df = df.dropna(subset=['lat', 'long'])
-
-   
     df['lat'] = pd.to_numeric(df['lat'], errors='coerce').fillna(0)
     df['long'] = pd.to_numeric(df['long'], errors='coerce').fillna(0)
 
@@ -141,11 +125,9 @@ else:
         df['long'].mean() if df['long'].sum() != 0 else 64.5853
     ]
     my_map = folium.Map(location=map_center, zoom_start=5)
-
     marker_group = folium.FeatureGroup(name="Stores").add_to(my_map)
-
     
-    color_map = {'Активен': "green", 'Не Активен': "red"}
+    color_map = {'Активен': "green", 'Неактивен': "red"}
 
     for _, row in df.iterrows():
         store_status = row['status']
@@ -154,15 +136,7 @@ else:
         folium.Marker(
             location=[row['lat'], row['long']],
             popup=f"""
-                <div style="
-                    font-family: Arial, sans-serif;
-                    font-size: 14px;
-                    color: #333;
-                    padding: 8px;
-                    border-radius: 8px;
-                    background: #fff;
-                    width: 200px;
-                ">
+                <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333; padding: 8px; border-radius: 8px; background: #fff; width: 200px;">
                     <b>ID Магазина:</b> {row['id']}<br>
                     <b>Клиент:</b> {row['organisation']}<br>
                     <b>Регион:</b> {row['region']}<br>
@@ -173,7 +147,6 @@ else:
             name=row['id']
         ).add_to(marker_group)
 
- 
     Search(
         layer=marker_group,
         search_label="name",
@@ -181,10 +154,7 @@ else:
         collapsed=False
     ).add_to(my_map)
 
-
-my_map.save("map.html");
-
-
+my_map.save("map.html")
 ```
 
 <iframe src="map.html" width="100%" height="800px"></iframe>
