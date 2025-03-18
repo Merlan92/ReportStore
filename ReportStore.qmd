@@ -31,7 +31,7 @@ from PIL import Image
 import requests
 
 # Загружаем данные
-df = pd.read_excel("DF-Set.xlsx")
+df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
 # Преобразуем статус
 df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Не Активен'})
 df['type'] = df['id'].apply(lambda x: 'OR' if sum(c.isalpha() for c in str(x)) >= 2 else 'IR')
@@ -140,28 +140,32 @@ plt.show();
 # Map
 ```{python}
 #| echo: false
-# Проверяем наличие координат
+
+
+import folium
+from folium.plugins import Search
+import pandas as pd
+
+
 if df.empty:
     my_map = folium.Map(location=[41.3775, 64.5853], zoom_start=5)
 else:
-    # Удаляем строки без координат
+    
     df = df.dropna(subset=['lat', 'long'])
 
-    # Преобразуем координаты
+   
     df['lat'] = pd.to_numeric(df['lat'], errors='coerce').fillna(0)
     df['long'] = pd.to_numeric(df['long'], errors='coerce').fillna(0)
 
-    # Центр карты
     map_center = [
         df['lat'].mean() if df['lat'].sum() != 0 else 41.3775,
         df['long'].mean() if df['long'].sum() != 0 else 64.5853
     ]
     my_map = folium.Map(location=map_center, zoom_start=5)
 
-    # Группируем маркеры
     marker_group = folium.FeatureGroup(name="Stores").add_to(my_map)
 
-    # Определяем цвета маркеров
+    
     color_map = {'Активен': "green", 'Не Активен': "red"}
 
     for _, row in df.iterrows():
@@ -170,8 +174,7 @@ else:
 
         folium.Marker(
             location=[row['lat'], row['long']],
-            popup=folium.Popup(
-                f"""
+            popup=f"""
                 <div style="
                     font-family: Arial, sans-serif;
                     font-size: 14px;
@@ -186,20 +189,23 @@ else:
                     <b>Регион:</b> {row['region']}<br>
                     <b>Статус:</b> {'🟢 Активный' if store_status == 'Активен' else '🔴 Неактивный'}
                 </div>
-                """,
-                max_width=250
-            ),
+            """,
             icon=folium.Icon(color=marker_color, icon='home'),
             name=row['id']
         ).add_to(marker_group)
 
-    # Добавляем поиск по ID магазина
+ 
     Search(
         layer=marker_group,
         search_label="name",
         placeholder="Поиск по ID магазина",
         collapsed=False
     ).add_to(my_map)
-display(my_map);
+
+
+my_map.save("map.html");
+
 
 ```
+
+<iframe src="map.html" width="100%" height="800px"></iframe>
