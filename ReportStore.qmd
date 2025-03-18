@@ -23,6 +23,7 @@ from PIL import Image
 import requests
 from itables import show
 
+df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
 df['status'] = df['status'].map({True: 'Активен', False: 'Не активен'})
 output_df = df[['organisation', 'status', 'type', 'id', 'region', 'city']].reset_index(drop=True)
 
