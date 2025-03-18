@@ -38,7 +38,7 @@ styled_output = df.style.apply(highlight_inactive, axis=1).set_table_styles([
     {'selector': 'thead th', 'props': [('color', 'white'), ('background-color', 'black')]}
 ])
 df = df[['organisation', 'status', 'type', 'id', 'region', 'city', 'lat', 'long']].reset_index(drop=True)
-display(styled_output)
+display(styled_output);
 ```
 
 ```{python}
@@ -65,7 +65,7 @@ dict(value=int(df['status'].eq('Активен').sum()))
 #| echo: false
 status_counts = df['status'].value_counts()
 colors = ['blue', 'red']
-labels = ['Активные', 'Неактивные']
+labels = ['Активные', 'Не Активные']
 
 plt.figure(figsize=(8, 8))
 plt.pie(
@@ -77,13 +77,13 @@ plt.pie(
     wedgeprops={'edgecolor': 'black'}
 )
 plt.title('Процент активных и неактивных магазинов', fontsize=16, fontweight='bold')
-plt.show()
+plt.show();
 ```
 
 ```{python}
 #| echo: false
 region_active_status = df.groupby(['region', 'status'])['id'].count().unstack(fill_value=0)
-colors = ['red', 'blue']
+colors = ['blue', 'red']
 ax = region_active_status.plot(
     kind='bar',
     stacked=False,
@@ -101,12 +101,14 @@ plt.xlabel('Регион', fontsize=14)
 plt.ylabel('Количество магазинов', fontsize=14)
 plt.xticks(rotation=45, fontsize=12)
 plt.yticks(fontsize=12)
-plt.legend(['Неактивные', 'Активные'], title='Статус', fontsize=12)
-plt.tight_layout()
-plt.show()
+plt.legend(['Активные', 'Не Активные'], title='Статус', fontsize=12)
+plt.tight_layout();
+plt.show();
 ```
 
 # Map
+
+
 ```{python}
 #| echo: false
 import folium
