@@ -26,13 +26,18 @@ import requests
 from itables import show
 
 df = pd.read_excel("DF-Set.xlsx")
+def highlight_inactive(row):
+    if row['status'] == 'Не активен':
+        return ['background-color: blue'] * len(row)
+    return [''] * len(row)
+df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+df['type'] = df['id'].apply(lambda x: 'OR' if sum(c.isalpha() for c in str(x)) >= 2 else 'IR') 
 df['status'] = df['status'].map({True: 'Активен', False: 'Не активен'})
-styled_output = output_df.style.apply(highlight_inactive, axis=1).set_table_styles([
+styled_output = df.style.apply(highlight_inactive, axis=1).set_table_styles([
     {'selector': 'thead th', 'props': [('color', 'white'), ('background-color', 'black')]}
 ])
-output_df = df[['organisation', 'status', 'type', 'id', 'region', 'city']].reset_index(drop=True)
-
-show(output_df)
+df = df[['organisation', 'status', 'type', 'id', 'region', 'city']].reset_index(drop=True)
+display(styled_output)  
 ```
 
 
