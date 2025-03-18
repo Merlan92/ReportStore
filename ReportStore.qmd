@@ -10,6 +10,8 @@ echo: false
 [Перейти на сайт BM Electronics](https://bme.uz/)
 
 
+# Info About The Received Data
+
 ```{python}
 #| echo: false
 import folium
@@ -32,16 +34,6 @@ show(output_df)
 ```
 
 
-# Info About The Received Data
-
-
-```{python}
-#| content: valuebox
-#| title: "Данные магазинов"
-#| echo: false
-
-show(styled_df);
-```
 
 ```{python}
 #| layout-nrow: 1
