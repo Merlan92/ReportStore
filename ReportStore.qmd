@@ -2,11 +2,21 @@
 title: "My First Project"
 format: 
   dashboard:
-    layout: [1,1]
+    sidebar:
+      - text: "Главная"
+        href: index.qmd
+      - text: "Отчеты"
+        href: reports.qmd
+      - text: "Посетить страницу"
+        href-external: https://bme.uz/
 echo: false
 ---
 
-# Data page
+# Information About BM Electronics
+![BM Electronics](https://avatars.mds.yandex.net/i?id=92d9463f247a088e92d27271bbe5806f_sr-5023418-images-thumbs&n=13.png){height=300 width=400}
+
+[Перейти на сайт BM Electronics](https://bme.uz/)
+
 
 ```{python}
 #| echo: false
@@ -38,12 +48,11 @@ def highlight_status(row):
     color = 'white' if row['status'] == 'Активен' else 'lightblue'
     return [f'background-color: {color}; color: black;' for _ in row]
 
-styled_df = output_df.style.apply(highlight_status, axis=1)
-
+styled_df = output_df.style.apply(highlight_status, axis=1);
 ```
 
 
-# information about the received data
+# Info About The Received Data
 
 
 ```{python}
@@ -191,7 +200,6 @@ else:
         placeholder="Поиск по ID магазина",
         collapsed=False
     ).add_to(my_map)
-
 display(my_map);
 
 ```
