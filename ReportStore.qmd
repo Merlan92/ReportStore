@@ -21,7 +21,7 @@ from PIL import Image
 import requests
 
 # Загружаем данные
-df = pd.read_excel(r"C:\Users\Modern 14\Desktop\DF-Set.xlsx")
+df = pd.read_excel("DF-Set.xlsx")
 # Преобразуем статус
 df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Не Активен'})
 df['type'] = df['id'].apply(lambda x: 'OR' if sum(c.isalpha() for c in str(x)) >= 2 else 'IR')
