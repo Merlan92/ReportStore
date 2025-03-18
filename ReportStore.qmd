@@ -1,14 +1,6 @@
 ---
 title: "My First Project"
-format: 
-  dashboard:
-    sidebar:
-      - text: "Главная"
-        href: index.qmd
-      - text: "Отчеты"
-        href: reports.qmd
-      - text: "Посетить страницу"
-        href-external: https://bme.uz/
+format: dashboard
 echo: false
 ---
 
@@ -29,26 +21,12 @@ from folium.plugins import Search
 from io import BytesIO
 from PIL import Image
 import requests
+from itables import show
 
-# Загружаем данные
-df = pd.read_excel("DF-Set.xlsx")
-# Преобразуем статус
-df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Не Активен'})
-df['type'] = df['id'].apply(lambda x: 'OR' if sum(c.isalpha() for c in str(x)) >= 2 else 'IR')
-
-# Приведение к Title Case
-text_columns = ['status', 'organisation', 'type', 'region', 'city']
-df[text_columns] = df[text_columns].apply(lambda col: col.astype(str).str.title())
-
-# Готовим финальную таблицу
+df['status'] = df['status'].map({True: 'Активен', False: 'Не активен'})
 output_df = df[['organisation', 'status', 'type', 'id', 'region', 'city']].reset_index(drop=True)
 
-# Функция стилизации
-def highlight_status(row):
-    color = 'white' if row['status'] == 'Активен' else 'lightblue'
-    return [f'background-color: {color}; color: black;' for _ in row]
-
-styled_df = output_df.style.apply(highlight_status, axis=1);
+show(output_df)
 ```
 
 
