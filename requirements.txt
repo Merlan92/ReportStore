@@ -1,6 +1,7 @@
 jupyter
 openpyxl
 pandas
+ipyleaflet
 numpy
 matplotlib
 itables==2.0.0
