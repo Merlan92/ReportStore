@@ -53,7 +53,7 @@ styled_df = output_df.style.apply(highlight_status, axis=1).set_table_styles([
                                  ("text-align", "center")]}
 ])
 
-show(styled_df);
+display(styled_df);
 ```
 # Main
 
