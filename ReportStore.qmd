@@ -32,7 +32,7 @@ output_df = df[['organisation', 'status', 'type', 'id', 'region', 'city']].reset
 ```
 
 ```{python}
-
+#| echo: false
 df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Не Активен'})
 df['type'] = df['id'].apply(lambda x: 'OR' if sum(c.isalpha() for c in str(x)) >= 2 else 'IR')
 output_df = df[['status', 'organisation', 'type', 'id', 'region', 'city']].reset_index(drop=True)
@@ -53,7 +53,7 @@ styled_df = output_df.style.apply(highlight_status, axis=1).set_table_styles([
                                  ("text-align", "center")]}
 ])
 
-display(styled_df);
+show(styled_df);
 ```
 # Main
 
@@ -148,14 +148,14 @@ import itables.options
 
 df_filtered = df[df['region'] == 'Регион']
 summary = df.groupby('region')['status'].value_counts().unstack(fill_value=0)
-summary.columns = ["Неактивные", "Активные"]
+summary.columns = ["Активные", "Не Активные"]
 
 display(summary)
 ```
 
 # Store in the Map
 ```{python}
-#| echo: 
+#| echo: false
 import pandas as pd
 from IPython.display import display
 import folium
