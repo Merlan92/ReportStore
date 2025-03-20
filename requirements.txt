@@ -1,6 +1,8 @@
 jupyter
 openpyxl
 pandas
+HTML
+display
 ipyleaflet
 numpy
 matplotlib
