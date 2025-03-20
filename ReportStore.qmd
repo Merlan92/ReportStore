@@ -18,123 +18,82 @@ from itables import show
 from io import BytesIO
 
 df = pd.read_excel("DF-Set.xlsx")
-
 ```
-
-# Description
-
-
-
-```{python}
-#| title: Hello it`s my first project
-url = "https://avatars.mds.yandex.net/i?id=3bc82374755bb30223c63a09b5977c4aa04551f4-12615842-images-thumbs&n=13.jpeg"
-response = requests.get(url)
-img = Image.open(BytesIO(response.content))
-
-display(img)  # Отображение изображения
-
-```
-
 
 # Listing Details
 
-
 ```{python}
-
 #| echo: false
-import pandas as pd
-from itables import show
 df = pd.read_excel("DF-Set.xlsx")
-
 df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Не Активен'})
 df['type'] = df['id'].apply(lambda x: 'OR' if sum(c.isalpha() for c in str(x)) >= 2 else 'IR')
 output_df = df[['organisation', 'status', 'type', 'id', 'region', 'city']].reset_index(drop=True)
+
 ```
 
-
 ```{python}
-import pandas as pd
-from itables import show
 
-# Читаем Excel-файл
-df = pd.read_excel("DF-Set.xlsx")
-
-# Заменяем True/False на "Активен"/"Не Активен"
 df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Не Активен'})
-
-# Определяем тип (OR/IR)
 df['type'] = df['id'].apply(lambda x: 'OR' if sum(c.isalpha() for c in str(x)) >= 2 else 'IR')
-
-# Выбираем нужные колонки
 output_df = df[['status', 'organisation', 'type', 'id', 'region', 'city']].reset_index(drop=True)
-
-# Применяем Title Case к строковым колонкам
 text_columns = ['status', 'organisation', 'type', 'region', 'city']
 output_df[text_columns] = output_df[text_columns].apply(lambda col: col.astype(str).str.title())
 
-# Функция для стилизации строк по статусу
 def highlight_status(row):
     color = 'white' if row['status'] == 'Активен' else 'lightblue'
     return [f'background-color: {color}; color: black; font-weight: normal;' for _ in row]
 
-# Применяем стили
 styled_df = output_df.style.apply(highlight_status, axis=1).set_table_styles([
-    {"selector": "table", "props": [("background-color", "#f0f0f0"),  # Фон всей таблицы
+    {"selector": "table", "props": [("background-color", "#f0f0f0"),  
                                     ("border", "2px solid black"),
                                     ("width", "100%")]},
-    {"selector": "th", "props": [("background-color", "#333"),  # Фон заголовков
+    {"selector": "th", "props": [("background-color", "#333"),  
                                  ("color", "white"),
                                  ("font-size", "16px"),
                                  ("text-align", "center")]}
 ])
 
-show(styled_df)
+show(styled_df);
 ```
-
-
 # Main
 
-## {height=10%}
-
-
+## Верхние карточки
 ```{python}
+#| echo: false
+#| layout-ncol: 2
 #| content: valuebox
 #| title: "Неактивные магазины"
-#| echo: false
+
 dict(
     icon="house",
     color="danger",
-    value=int(df['status'].eq('Не Активен').sum())  # eq() - аналог (df['status'] == 'Не Активен')
-)
+    value=int(df['status'].eq('Не Активен').sum()) 
+);
 ```
 
 ```{python}
+#| echo: false
 #| content: valuebox
 #| title: "Активные магазины"
-#| echo: false
 dict(
     icon="house",
     color="success",
     value=int(df['status'].eq('Активен').sum())  
-)
+);
 ```
-
-
-# View Pie
 
 
 
 ```{python}
 #| echo: false
+#| layout-ncol: 2 
 #| title: Active Shops
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_excel("DF-Set.xlsx")
-
 status_counts = df['status'].value_counts()
 colors = ['blue', 'red']
-labels = ['Active', 'UnActive']
+labels = ['Активные', 'Не Активные']
 
 plt.figure(figsize=(8, 8))
 plt.pie(
@@ -145,18 +104,17 @@ plt.pie(
     colors=colors,
     wedgeprops={'edgecolor': 'black'})
 
-plt.title('Percentage of Active and UnActive Stores', fontsize=16, fontweight='bold')
+plt.title('Percentage of Active and InActive Stores', fontsize=16, fontweight='bold')
 plt.show();
 ```
 
 ```{python}
 #| echo: false
 #| title: Active UnActive Shops
-df = pd.read_excel("DF-Set.xlsx")
 
 region_active_status = df.groupby(['region', 'status'])['id'].count().unstack(fill_value=0)
 
-colors = ['red', 'blue']
+colors = ['blue', 'red']
 
 ax = region_active_status.plot(
     kind='bar',
@@ -171,125 +129,99 @@ for container in ax.containers:
     ax.bar_label(container, fmt='%d', fontsize=12, padding=3)
 
 
-plt.title('Active and UnActive Stores by Region', fontsize=16, fontweight='bold')
+plt.title('Active and InActive Stores by Region', fontsize=16, fontweight='bold')
 plt.xlabel('Region', fontsize=14)
 plt.ylabel('Count of Stores', fontsize=14)
 plt.xticks(rotation=45, fontsize=12)
 plt.yticks(fontsize=12)
-plt.legend(['Не Активны', 'Активнык'], title='Status', fontsize=12)
+plt.legend(['Активны', 'Не Активные'], title='Status', fontsize=12)
 plt.tight_layout()
 
 plt.show();
 ```
 
-# Store in the Map
 
-
+# Tables Store
 ```{python}
+#| echo: false
+import itables.options
+
+df_filtered = df[df['region'] == 'Регион']
+summary = df.groupby('region')['status'].value_counts().unstack(fill_value=0)
+summary.columns = ["Неактивные", "Активные"]
+
+display(summary)
+```
+
+# Store in the Map
+```{python}
+#| echo: 
 import pandas as pd
-import ipyleaflet as L
-from ipywidgets import HTML
+from IPython.display import display
 import folium
-from folium.plugins import Search
-import pandas as pd
+from folium.plugins import Search, MarkerCluster
 
-df = pd.DataFrame({
-    "id": [1, 2],
-    "organisation": ["Store A", "Store B"],
-    "region": ["Tashkent", "Samarkand"],
-    "lat": [41.2798, 39.6543],
-    "long": [69.2187, 66.9755],
-    "status": ["Активен", "Неактивен"]
-})
 
+df = pd.read_excel("DF-Set.xlsx")
 if df.empty:
+    print("DataFrame пуст, создаем стандартную карту.")
     my_map = folium.Map(location=[41.3775, 64.5853], zoom_start=5)
 else:
+   
+    required_columns = {'id', 'lat', 'long', 'status', 'organisation', 'region'}
+    if not required_columns.issubset(df.columns):
+        raise ValueError(f"Отсутствуют обязательные колонки: {required_columns - set(df.columns)}")
+
+  
+    df['lat'] = pd.to_numeric(df['lat'], errors='coerce')
+    df['long'] = pd.to_numeric(df['long'], errors='coerce')
+
+   
     df = df.dropna(subset=['lat', 'long'])
-    df['lat'] = pd.to_numeric(df['lat'], errors='coerce').fillna(0)
-    df['long'] = pd.to_numeric(df['long'], errors='coerce').fillna(0)
+    df = df[df['lat'].between(-90, 90) & df['long'].between(-180, 180)]
 
-    map_center = [
-        df['lat'].mean() if df['lat'].sum() != 0 else 41.3775,
-        df['long'].mean() if df['long'].sum() != 0 else 64.5853
-    ]
-    my_map = folium.Map(location=map_center, zoom_start=10)
+    df['status'] = df['status'].astype(bool)
+    df['id'] = df['id'].fillna("N/A").astype(str)
+    df['region'] = df['region'].fillna("Unknown")
 
-    marker_group = folium.FeatureGroup(name="Stores").add_to(my_map)
 
-    color_map = {'Активен': "green", 'Неактивен': "red"}
+    map_center = [df['lat'].mean(), df['long'].mean()]
+    my_map = folium.Map(location=map_center, zoom_start=5)
+
+    marker_cluster = MarkerCluster().add_to(my_map)
+
+    # Функция определения цвета
+    def get_marker_color(status):
+        return "green" if status else "red"
+
+    searchable_markers = []
 
     for _, row in df.iterrows():
-        store_status = row['status']
-        marker_color = color_map.get(store_status, "gray")
+        marker_color = get_marker_color(row['status'])
 
-        folium.Marker(
+        marker = folium.Marker(
             location=[row['lat'], row['long']],
-            popup=f"""
-                <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333; padding: 8px; border-radius: 8px; background: #fff; width: 200px;">
-                    <b>ID Магазина:</b> {row['id']}<br>
+            popup=folium.Popup(
+                f"""
+                <div style="font-family: Arial, sans-serif; font-size: 14px; padding: 8px;">
                     <b>Клиент:</b> {row['organisation']}<br>
+                    <b>ID Магазина:</b> {row['id']}<br>
                     <b>Регион:</b> {row['region']}<br>
-                    <b>Статус:</b> {'🟢 Активный' if store_status == 'Активен' else '🔴 Неактивный'}
+                    <b>Статус:</b> {'🟢 Активный' if row['status'] else '🔴 Неактивный'}
                 </div>
-            """,
+                """,
+                max_width=250
+            ),
             icon=folium.Icon(color=marker_color, icon='home'),
-            name=row['id']
-        ).add_to(marker_group)
-
+        )
+        marker.add_to(marker_cluster)
+        searchable_markers.append({"location": [row['lat'], row['long']], "id": row['id']})
     Search(
-        layer=marker_group,
-        search_label="name",
-        placeholder="Поиск по ID магазина",
+        layer=marker_cluster,  
+        search_label="id", 
+        placeholder="Введите ID магазина",
         collapsed=False
     ).add_to(my_map)
 
-
-google_maps_iframe = """
-<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d47973.35329391476!2d69.21868927975349!3d41.279822169247296!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38aef54ef91ad413%3A0x244d8781fc34c779!2sBM%20ELECTRONICS!5e0!3m2!1sen!2s!4v1737027720668!5m2!1sen!2s"
-        width="100%" height="300px" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-"""
-
-iframe = folium.IFrame(google_maps_iframe, width=500, height=350)
-popup = folium.Popup(iframe, max_width=600)
-folium.Marker([41.2798, 69.2187], popup=popup, icon=folium.Icon(color="blue", icon="cloud")).add_to(my_map)
-
-my_map.save("map.html")
-
-```
-
-```{python}
-import pandas as pd
-from IPython.core.display import display, HTML
-
-# Загрузка данных
-file_path = ("DF-Set.xlsx")
-df = pd.read_excel(file_path)
-
-df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Неактивен'})
-
-# Проверяем, есть ли координаты
-df = df.dropna(subset=['lat', 'long'])
-df['lat'] = pd.to_numeric(df['lat'], errors='coerce').fillna(0)
-df['long'] = pd.to_numeric(df['long'], errors='coerce').fillna(0)
-
-# Центр карты (среднее значение координат)
-map_center = [df['lat'].mean(), df['long'].mean()]
-
-# Создаем маркеры для магазинов
-markers = "".join([
-    f"&markers=color:{'green' if row['status'] == 'Активен' else 'red'}%7C{row['lat']},{row['long']}"
-    for _, row in df.iterrows()
-])
-
-# Генерация URL Google Maps Static API
-google_maps_url = (
-    f"https://maps.googleapis.com/maps/api/staticmap?center={map_center[0]},{map_center[1]}"
-    f"&zoom=10&size=800x600&maptype=roadmap{markers}"
-    f"&key=YOUR_GOOGLE_MAPS_API_KEY"  # Замените на ваш API-ключ
-)
-
-# Отображаем карту в проекте QMD
-display(HTML(f'<img src="{google_maps_url}" style="width:100%; max-width:800px;" />'))
-
+display(my_map);
 ```
