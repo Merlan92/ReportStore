@@ -5,7 +5,6 @@ echo: false
 ---
 
 ```{python}
-
 #| echo: false
 import folium
 import requests
@@ -127,7 +126,7 @@ dict(
 
 ```{python}
 #| echo: false
-#|  title: Active Shops
+#| title: Active Shops
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -187,8 +186,6 @@ plt.show();
 
 
 ```{python}
-#| echo: false
-#| Title: Store by Map
 import pandas as pd
 import ipyleaflet as L
 from ipywidgets import HTML
@@ -266,7 +263,7 @@ import pandas as pd
 from IPython.core.display import display, HTML
 
 # Загрузка данных
-file_path = r"C:\Users\Modern 14\Desktop\DF-Set.xlsx"
+file_path = ("DF-Set.xlsx")
 df = pd.read_excel(file_path)
 
 df['status'] = df['status'].astype(str).replace({'True': 'Активен', 'False': 'Неактивен'})
